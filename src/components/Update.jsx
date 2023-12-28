@@ -8,19 +8,16 @@ import {
     Button,
 } from "@material-tailwind/react";
 import axios from "axios";
-import { useState } from "react";
 import {  useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 
-const Update = () => {
+const Update = ({ albums, setAlbums, title, setTitle }) => {
 
     const { id } = useParams();
 
     const navigate = useNavigate();
-
-    const[ title, setTitle ] = useState("");
 
     const handleUpdate = async () => {
 
@@ -32,6 +29,15 @@ const Update = () => {
         try {
            const { data } =  await axios.get(`https://jsonplaceholder.typicode.com/albums/${id}`)
            const { userId } = data;
+           const getAlbumIndex = albums.findIndex((album) => parseInt(album.id) === parseInt(id) )
+           
+            albums[getAlbumIndex] = {
+                userId,
+                id,
+                title
+               };
+            setAlbums(albums);
+           
            const response = await axios.put(`https://jsonplaceholder.typicode.com/albums/${id}`, {
             id,
             userId,
@@ -41,7 +47,7 @@ const Update = () => {
            toast.success(`Title updated to ${response.data.title}`)
 
            setTitle("")
-           navigate('/')
+           navigate(-1)
         } catch (error) {
             toast.error("Error updating Album")
             setTitle("")

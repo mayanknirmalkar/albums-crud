@@ -10,13 +10,16 @@ import axios from "axios"
 import { Link } from "react-router-dom"
 import { toast } from 'react-toastify';
 
-const Albums = () => {
+const Albums = ({ dataFetched, setDataFetched, albums, setAlbums }) => {
 
-  const [ albums, setAlbums ] = useState([]);
+  
 
   const deleteHandle = async (id) => {
 
     try {
+      const newAlbum = albums.filter((album) => album.id != id);
+      setAlbums(newAlbum);
+
       await axios.delete(`https://jsonplaceholder.typicode.com/albums/${id}`)
     
       toast.success("Delete successful!")
@@ -31,11 +34,14 @@ const Albums = () => {
     async function fetch() {
       
       const response = await axios.get("https://jsonplaceholder.typicode.com/albums");
-
       setAlbums(response.data)
+      setDataFetched(true);
     }
 
-    fetch();
+    if(!dataFetched){
+      fetch();
+    }
+    
   },[])
 
   return (

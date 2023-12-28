@@ -8,14 +8,12 @@ import {
     Button,
 } from "@material-tailwind/react";
 import axios from "axios";
-import { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-const Add = () => {
+const Add = ({ albums, setAlbums, userId, setUserId, title, setTitle }) => {
 
-    const [ title, setTitle ] = useState("");
-    const [ userId, setUserId ] = useState("");
+    
     const navigate = useNavigate();
 
     const handleAdd = async () => {
@@ -26,18 +24,29 @@ const Add = () => {
                 return;
             }
 
+            if(typeof parseInt(userId) !== 'number'){
+                toast.error("Please enter a number in userid")
+                return;
+            }
+
             const { data } = await axios.get(`https://jsonplaceholder.typicode.com/albums`)
             const id = data.length + 1;
+            
+            userId = parseInt(userId)
+            
+            albums.push({userId, id, title});
+            setAlbums(albums);
+
             const response = await axios.post(`https://jsonplaceholder.typicode.com/albums`, {
-                id,
                 userId,
+                id,
                 title
             })
             
             toast.success(`New Album ${response.data.title} has been added`)
             setUserId("")
             setTitle("")
-            navigate('/')
+            navigate(-1)
         } catch (error) {
             toast.error("Error adding album")
             setUserId("")
